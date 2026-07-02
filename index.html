@@ -337,9 +337,9 @@
       <div class="setting-group">
         <label class="explore-by-label">Explore by</label>
         <div class="chip-group" id="exploreByChips">
-          <button class="chip" data-explore="Understanding Evaluation">Understanding Evaluation</button>
+          <button class="chip active" data-explore="Understanding Evaluation">Understanding Evaluation</button>
           <button class="chip" data-explore="Generation Evaluation">Generation Evaluation</button>
-          <button class="chip active" data-explore="Leardboards and Tools">Leardboards and Tools</button>
+          <button class="chip" data-explore="Leardboards and Tools">Leardboards and Tools</button>
         </div>
       </div>
 
@@ -351,10 +351,15 @@
 
       <div class="setting-group">
         <label>Time Range</label>
-        <input type="range" id="timeSlider" min="0" max="100" value="100">
+        <input type="range" id="timeMinSlider" min="0" max="100" value="0">
         <div class="range-labels">
-          <span>2020</span>
-          <span id="timeLabel">2026-07</span>
+          <span>From: <span id="timeMinLabel">2020-01</span></span>
+          <span></span>
+        </div>
+        <input type="range" id="timeSlider" min="0" max="100" value="100" style="margin-top:8px;">
+        <div class="range-labels">
+          <span>To: <span id="timeLabel">2026-07</span></span>
+          <span></span>
         </div>
       </div>
 
@@ -449,7 +454,7 @@
       },
     };
 
-    let currentExplore = 'Leardboards and Tools';
+    let currentExplore = 'Understanding Evaluation';
 
     function getOrgColors() {
       return exploreCategories[currentExplore].colors;
@@ -487,6 +492,7 @@
 
     // State
     let selectedOrgs = new Set();
+    let currentMinDate = new Date('2020-01-01');
     let currentMaxDate = new Date('2026-07-01');
     let scoreMin = 0;
     let scoreMax = 12000;
@@ -589,6 +595,7 @@
     function render() {
       let filtered = allData.filter(d =>
         selectedOrgs.has(d.org) &&
+        new Date(d.date) >= currentMinDate &&
         new Date(d.date) <= currentMaxDate &&
         d.citations >= scoreMin &&
         d.citations <= scoreMax
@@ -652,8 +659,8 @@
           axisTick: { lineStyle: { color: '#ddd' } },
           axisLabel: { color: '#666', fontSize: 12 },
           splitLine: { show: true, lineStyle: { color: '#f5f5f5' } },
-          min: '2020-01-01',
-          max: '2026-07-01',
+          min: currentMinDate.toISOString().split('T')[0],
+          max: currentMaxDate.toISOString().split('T')[0],
         },
         yAxis: {
           type: 'value',
@@ -676,6 +683,8 @@
     }
 
     // Click on chart point to show paper/github links
+    let clickedDataPoint = false;
+
     chart.on('click', function(params) {
       const paperInfo = document.getElementById('paperInfo');
       const paperTitle = document.getElementById('paperTitle');
@@ -683,23 +692,32 @@
       const githubLink = document.getElementById('githubLink');
 
       if (params.data && (params.data.paper || params.data.github)) {
+        clickedDataPoint = true;
         paperTitle.textContent = params.data.name;
         if (params.data.paper) {
           paperLink.href = params.data.paper;
-          paperLink.style.display = 'inline';
+          paperLink.style.display = 'inline-flex';
         } else {
           paperLink.style.display = 'none';
         }
         if (params.data.github) {
           githubLink.href = params.data.github;
-          githubLink.style.display = 'inline';
+          githubLink.style.display = 'inline-flex';
         } else {
           githubLink.style.display = 'none';
         }
         paperInfo.style.display = 'block';
-      } else {
-        paperInfo.style.display = 'none';
       }
+    });
+
+    // Hide paper panel when clicking anywhere except a data point
+    document.addEventListener('click', function(e) {
+      if (clickedDataPoint) {
+        clickedDataPoint = false;
+        return;
+      }
+      const paperInfo = document.getElementById('paperInfo');
+      paperInfo.style.display = 'none';
     });
 
     // Org checkboxes
@@ -731,10 +749,30 @@
       }
     });
 
-    // Time slider
+    // Time sliders
+    const timeMinSlider = document.getElementById('timeMinSlider');
+    const timeMinLabel = document.getElementById('timeMinLabel');
+    timeMinSlider.addEventListener('input', function() {
+      if (parseInt(this.value) >= parseInt(timeSlider.value)) {
+        this.value = parseInt(timeSlider.value) - 1;
+        return;
+      }
+      const pct = this.value / 100;
+      const range = maxDate.getTime() - minDate.getTime();
+      currentMinDate = new Date(minDate.getTime() + range * pct);
+      const year = currentMinDate.getFullYear();
+      const month = String(currentMinDate.getMonth() + 1).padStart(2, '0');
+      timeMinLabel.textContent = `${year}-${month}`;
+      render();
+    });
+
     const timeSlider = document.getElementById('timeSlider');
     const timeLabel = document.getElementById('timeLabel');
     timeSlider.addEventListener('input', function() {
+      if (parseInt(this.value) <= parseInt(timeMinSlider.value)) {
+        this.value = parseInt(timeMinSlider.value) + 1;
+        return;
+      }
       const pct = this.value / 100;
       const range = maxDate.getTime() - minDate.getTime();
       currentMaxDate = new Date(minDate.getTime() + range * pct);
