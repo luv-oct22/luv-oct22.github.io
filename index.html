@@ -14,7 +14,7 @@
       padding: 40px;
     }
     .header {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto 24px;
     }
     .header h1 {
@@ -27,45 +27,178 @@
       font-size: 14px;
       line-height: 1.5;
     }
-    .container {
-      max-width: 1100px;
+    .main-layout {
+      max-width: 1200px;
       margin: 0 auto;
+      display: flex;
+      gap: 20px;
+    }
+    .chart-container {
+      flex: 1;
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.08);
       padding: 24px;
     }
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-    .filters label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #555;
-      margin-right: 8px;
-    }
-    .btn {
-      padding: 6px 14px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
+    .settings-panel {
+      width: 280px;
       background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 20px;
+      height: fit-content;
+    }
+    .settings-panel h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .settings-panel h3::before {
+      content: "\2699";
+      font-size: 18px;
+    }
+    .setting-group {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .setting-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .setting-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 13px;
       cursor: pointer;
-      transition: all 0.2s;
     }
-    .btn:hover { border-color: #999; }
-    .btn.active {
+    .checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #333;
+      cursor: pointer;
+    }
+    .color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .setting-group select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      background: #fafafa;
+      cursor: pointer;
+    }
+    .setting-group input[type="range"] {
+      width: 100%;
+      margin-top: 6px;
+    }
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #555;
+    }
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #ccc;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 2px;
+      bottom: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle input:checked + .toggle-slider {
       background: #333;
-      color: #fff;
-      border-color: #333;
+    }
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(16px);
     }
     #chart {
       width: 100%;
       height: 520px;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .toolbar-left {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .toolbar-btn {
+      padding: 6px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      color: #555;
+      transition: all 0.2s;
+    }
+    .toolbar-btn:hover {
+      border-color: #999;
+      color: #333;
+    }
+    .toolbar-btn.active {
+      background: #333;
+      color: #fff;
+      border-color: #333;
     }
     .legend {
       display: flex;
@@ -87,59 +220,101 @@
       height: 10px;
       border-radius: 50%;
     }
-    .slider-container {
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .slider-container label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #555;
-    }
-    .slider-container input[type="range"] {
-      flex: 1;
-      height: 4px;
-    }
-    .slider-container span {
-      font-size: 13px;
+    .score-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #f0f0f0;
       color: #666;
-      min-width: 90px;
     }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Model Capabilities Index</h1>
-    <p>Tracking AI model performance over time across organizations. Interactive scatter plot with filtering by organization and time range.</p>
+    <p>Tracking AI model performance over time across organizations. Interactive scatter plot with filtering by organization, score range, and time period.</p>
   </div>
 
-  <div class="container">
-    <div class="filters">
-      <label>Organization:</label>
-      <button class="btn active" data-org="all">All</button>
-      <button class="btn" data-org="OpenAI">OpenAI</button>
-      <button class="btn" data-org="Google">Google</button>
-      <button class="btn" data-org="Anthropic">Anthropic</button>
-      <button class="btn" data-org="Meta">Meta</button>
-      <button class="btn" data-org="Mistral">Mistral</button>
-      <button class="btn" data-org="DeepSeek">DeepSeek</button>
+  <div class="main-layout">
+    <div class="chart-container">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="toolbar-btn active" data-chart="scatter">Scatter</button>
+          <button class="toolbar-btn" data-chart="line">Line</button>
+        </div>
+        <div class="toolbar-left">
+          <button class="toolbar-btn" id="btnShare">Share</button>
+          <button class="toolbar-btn" id="btnDownload">Download</button>
+        </div>
+      </div>
+
+      <div id="chart"></div>
+
+      <div class="legend" id="legend"></div>
     </div>
 
-    <div id="chart"></div>
+    <div class="settings-panel">
+      <h3>Settings</h3>
 
-    <div class="slider-container">
-      <label>Time Range:</label>
-      <input type="range" id="timeSlider" min="0" max="100" value="100">
-      <span id="timeLabel">2020 - 2026</span>
+      <div class="setting-group">
+        <label>Organizations</label>
+        <div class="checkbox-group" id="orgCheckboxes">
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Time Range</label>
+        <input type="range" id="timeSlider" min="0" max="100" value="100">
+        <div class="range-labels">
+          <span>2020</span>
+          <span id="timeLabel">2026-07</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Score Range</label>
+        <input type="range" id="scoreMinSlider" min="0" max="180" value="0">
+        <div class="range-labels">
+          <span>Min: <span id="scoreMinLabel">0</span></span>
+          <span></span>
+        </div>
+        <input type="range" id="scoreMaxSlider" min="0" max="180" value="180" style="margin-top:8px;">
+        <div class="range-labels">
+          <span>Max: <span id="scoreMaxLabel">180</span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Display</label>
+        <div class="toggle-row" style="margin-bottom:10px;">
+          <span>Show Labels</span>
+          <label class="toggle">
+            <input type="checkbox" id="toggleLabels">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span>Connect Points</span>
+          <label class="toggle">
+            <input type="checkbox" id="toggleLines">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Point Size</label>
+        <input type="range" id="sizeSlider" min="6" max="24" value="14">
+        <div class="range-labels">
+          <span>Small</span>
+          <span>Large</span>
+        </div>
+      </div>
     </div>
-
-    <div class="legend" id="legend"></div>
   </div>
 
   <script>
-    // Color palette
     const orgColors = {
       'OpenAI': '#e91e63',
       'Google': '#26a69a',
@@ -149,84 +324,116 @@
       'DeepSeek': '#8e24aa',
     };
 
-    // Generate random demo data
-    function generateData() {
-      const models = [
-        // OpenAI
-        {name: 'GPT-3', date: '2020-06-11', score: 48, org: 'OpenAI'},
-        {name: 'GPT-3.5', date: '2022-11-30', score: 72, org: 'OpenAI'},
-        {name: 'GPT-4', date: '2023-03-14', score: 98, org: 'OpenAI'},
-        {name: 'GPT-4 Turbo', date: '2023-11-06', score: 108, org: 'OpenAI'},
-        {name: 'GPT-4o', date: '2024-05-13', score: 118, org: 'OpenAI'},
-        {name: 'o1', date: '2024-09-12', score: 135, org: 'OpenAI'},
-        {name: 'o3', date: '2025-04-16', score: 156, org: 'OpenAI'},
-        {name: 'GPT-5', date: '2025-08-01', score: 168, org: 'OpenAI'},
-        // Google
-        {name: 'PaLM', date: '2022-04-04', score: 62, org: 'Google'},
-        {name: 'PaLM 2', date: '2023-05-10', score: 88, org: 'Google'},
-        {name: 'Gemini 1.0', date: '2023-12-06', score: 105, org: 'Google'},
-        {name: 'Gemini 1.5 Pro', date: '2024-02-15', score: 115, org: 'Google'},
-        {name: 'Gemini 2.0', date: '2024-12-11', score: 138, org: 'Google'},
-        {name: 'Gemini 2.5 Pro', date: '2025-03-25', score: 158, org: 'Google'},
-        // Anthropic
-        {name: 'Claude 1', date: '2023-03-14', score: 78, org: 'Anthropic'},
-        {name: 'Claude 2', date: '2023-07-11', score: 90, org: 'Anthropic'},
-        {name: 'Claude 3 Haiku', date: '2024-03-04', score: 95, org: 'Anthropic'},
-        {name: 'Claude 3 Opus', date: '2024-03-04', score: 120, org: 'Anthropic'},
-        {name: 'Claude 3.5 Sonnet', date: '2024-06-20', score: 130, org: 'Anthropic'},
-        {name: 'Claude 4 Opus', date: '2025-05-22', score: 160, org: 'Anthropic'},
-        // Meta
-        {name: 'LLaMA', date: '2023-02-24', score: 65, org: 'Meta'},
-        {name: 'LLaMA 2', date: '2023-07-18', score: 82, org: 'Meta'},
-        {name: 'LLaMA 3', date: '2024-04-18', score: 105, org: 'Meta'},
-        {name: 'LLaMA 3.1 405B', date: '2024-07-23', score: 122, org: 'Meta'},
-        {name: 'LLaMA 4', date: '2025-04-05', score: 145, org: 'Meta'},
-        // Mistral
-        {name: 'Mistral 7B', date: '2023-09-27', score: 70, org: 'Mistral'},
-        {name: 'Mixtral 8x7B', date: '2023-12-11', score: 85, org: 'Mistral'},
-        {name: 'Mistral Large', date: '2024-02-26', score: 102, org: 'Mistral'},
-        {name: 'Mistral Large 2', date: '2024-07-24', score: 118, org: 'Mistral'},
-        {name: 'Mistral Medium 3', date: '2025-05-17', score: 140, org: 'Mistral'},
-        // DeepSeek
-        {name: 'DeepSeek V1', date: '2024-01-05', score: 88, org: 'DeepSeek'},
-        {name: 'DeepSeek V2', date: '2024-05-16', score: 108, org: 'DeepSeek'},
-        {name: 'DeepSeek V3', date: '2024-12-26', score: 135, org: 'DeepSeek'},
-        {name: 'DeepSeek R1', date: '2025-01-20', score: 148, org: 'DeepSeek'},
-      ];
-      return models;
-    }
+    const allData = [
+      {name: 'GPT-3', date: '2020-06-11', score: 48, org: 'OpenAI'},
+      {name: 'GPT-3.5', date: '2022-11-30', score: 72, org: 'OpenAI'},
+      {name: 'GPT-4', date: '2023-03-14', score: 98, org: 'OpenAI'},
+      {name: 'GPT-4 Turbo', date: '2023-11-06', score: 108, org: 'OpenAI'},
+      {name: 'GPT-4o', date: '2024-05-13', score: 118, org: 'OpenAI'},
+      {name: 'o1', date: '2024-09-12', score: 135, org: 'OpenAI'},
+      {name: 'o3', date: '2025-04-16', score: 156, org: 'OpenAI'},
+      {name: 'GPT-5', date: '2025-08-01', score: 168, org: 'OpenAI'},
+      {name: 'PaLM', date: '2022-04-04', score: 62, org: 'Google'},
+      {name: 'PaLM 2', date: '2023-05-10', score: 88, org: 'Google'},
+      {name: 'Gemini 1.0', date: '2023-12-06', score: 105, org: 'Google'},
+      {name: 'Gemini 1.5 Pro', date: '2024-02-15', score: 115, org: 'Google'},
+      {name: 'Gemini 2.0', date: '2024-12-11', score: 138, org: 'Google'},
+      {name: 'Gemini 2.5 Pro', date: '2025-03-25', score: 158, org: 'Google'},
+      {name: 'Claude 1', date: '2023-03-14', score: 78, org: 'Anthropic'},
+      {name: 'Claude 2', date: '2023-07-11', score: 90, org: 'Anthropic'},
+      {name: 'Claude 3 Haiku', date: '2024-03-04', score: 95, org: 'Anthropic'},
+      {name: 'Claude 3 Opus', date: '2024-03-04', score: 120, org: 'Anthropic'},
+      {name: 'Claude 3.5 Sonnet', date: '2024-06-20', score: 130, org: 'Anthropic'},
+      {name: 'Claude 4 Opus', date: '2025-05-22', score: 160, org: 'Anthropic'},
+      {name: 'LLaMA', date: '2023-02-24', score: 65, org: 'Meta'},
+      {name: 'LLaMA 2', date: '2023-07-18', score: 82, org: 'Meta'},
+      {name: 'LLaMA 3', date: '2024-04-18', score: 105, org: 'Meta'},
+      {name: 'LLaMA 3.1 405B', date: '2024-07-23', score: 122, org: 'Meta'},
+      {name: 'LLaMA 4', date: '2025-04-05', score: 145, org: 'Meta'},
+      {name: 'Mistral 7B', date: '2023-09-27', score: 70, org: 'Mistral'},
+      {name: 'Mixtral 8x7B', date: '2023-12-11', score: 85, org: 'Mistral'},
+      {name: 'Mistral Large', date: '2024-02-26', score: 102, org: 'Mistral'},
+      {name: 'Mistral Large 2', date: '2024-07-24', score: 118, org: 'Mistral'},
+      {name: 'Mistral Medium 3', date: '2025-05-17', score: 140, org: 'Mistral'},
+      {name: 'DeepSeek V1', date: '2024-01-05', score: 88, org: 'DeepSeek'},
+      {name: 'DeepSeek V2', date: '2024-05-16', score: 108, org: 'DeepSeek'},
+      {name: 'DeepSeek V3', date: '2024-12-26', score: 135, org: 'DeepSeek'},
+      {name: 'DeepSeek R1', date: '2025-01-20', score: 148, org: 'DeepSeek'},
+    ];
 
-    const allData = generateData();
     const chart = echarts.init(document.getElementById('chart'));
 
-    let currentOrg = 'all';
+    // State
+    let selectedOrgs = new Set(Object.keys(orgColors));
     let currentMaxDate = new Date('2026-07-01');
+    let scoreMin = 0;
+    let scoreMax = 180;
+    let showLabels = false;
+    let showLines = false;
+    let pointSize = 14;
+    let chartType = 'scatter';
     const minDate = new Date('2020-01-01');
     const maxDate = new Date('2026-07-01');
 
-    function render() {
-      let filtered = allData;
-      if (currentOrg !== 'all') {
-        filtered = filtered.filter(d => d.org === currentOrg);
-      }
-      filtered = filtered.filter(d => new Date(d.date) <= currentMaxDate);
+    // Build org checkboxes
+    const orgCheckboxContainer = document.getElementById('orgCheckboxes');
+    Object.entries(orgColors).forEach(([org, color]) => {
+      const item = document.createElement('label');
+      item.className = 'checkbox-item';
+      item.innerHTML = `
+        <input type="checkbox" checked data-org="${org}">
+        <span class="color-dot" style="background:${color};"></span>
+        ${org}
+      `;
+      orgCheckboxContainer.appendChild(item);
+    });
 
-      // Group by org for series
+    // Build legend
+    const legendEl = document.getElementById('legend');
+    Object.entries(orgColors).forEach(([org, color]) => {
+      legendEl.innerHTML += `
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${color};"></div>
+          ${org}
+        </div>
+      `;
+    });
+
+    function render() {
+      let filtered = allData.filter(d =>
+        selectedOrgs.has(d.org) &&
+        new Date(d.date) <= currentMaxDate &&
+        d.score >= scoreMin &&
+        d.score <= scoreMax
+      );
+
       const orgs = [...new Set(filtered.map(d => d.org))];
-      const series = orgs.map(org => ({
-        name: org,
-        type: 'scatter',
-        data: filtered.filter(d => d.org === org).map(d => ({
-          value: [d.date, d.score],
-          name: d.name,
-        })),
-        symbolSize: 14,
-        itemStyle: { color: orgColors[org] },
-        emphasis: {
-          itemStyle: { borderColor: '#333', borderWidth: 2 },
-          scale: 1.4,
-        },
-      }));
+      const series = orgs.map(org => {
+        const orgData = filtered.filter(d => d.org === org).sort((a, b) => new Date(a.date) - new Date(b.date));
+        return {
+          name: org,
+          type: chartType === 'line' ? 'line' : 'scatter',
+          data: orgData.map(d => ({
+            value: [d.date, d.score],
+            name: d.name,
+          })),
+          symbolSize: pointSize,
+          itemStyle: { color: orgColors[org] },
+          lineStyle: showLines || chartType === 'line' ? { width: 2, opacity: 0.6 } : { width: 0 },
+          showSymbol: true,
+          label: {
+            show: showLabels,
+            formatter: p => p.data.name,
+            fontSize: 10,
+            color: '#555',
+            position: 'top',
+          },
+          emphasis: {
+            itemStyle: { borderColor: '#333', borderWidth: 2 },
+            scale: 1.4,
+          },
+        };
+      });
 
       const option = {
         animation: true,
@@ -246,12 +453,7 @@
                     <span style="color:#999;">Score:</span> ${params.data.value[1]}`;
           }
         },
-        grid: {
-          left: 60,
-          right: 40,
-          top: 20,
-          bottom: 50,
-        },
+        grid: { left: 60, right: 30, top: 20, bottom: 50 },
         xAxis: {
           type: 'time',
           name: 'Release Date',
@@ -275,7 +477,7 @@
           axisTick: { lineStyle: { color: '#ddd' } },
           axisLabel: { color: '#666', fontSize: 12 },
           splitLine: { lineStyle: { color: '#f5f5f5' } },
-          min: 30,
+          min: 0,
           max: 180,
         },
         series: series,
@@ -284,39 +486,89 @@
       chart.setOption(option, true);
     }
 
-    // Filter buttons
-    document.querySelectorAll('.btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentOrg = this.dataset.org;
+    // Org checkboxes
+    orgCheckboxContainer.addEventListener('change', function(e) {
+      if (e.target.type === 'checkbox') {
+        const org = e.target.dataset.org;
+        if (e.target.checked) {
+          selectedOrgs.add(org);
+        } else {
+          selectedOrgs.delete(org);
+        }
         render();
-      });
+      }
     });
 
     // Time slider
-    const slider = document.getElementById('timeSlider');
+    const timeSlider = document.getElementById('timeSlider');
     const timeLabel = document.getElementById('timeLabel');
-
-    slider.addEventListener('input', function() {
+    timeSlider.addEventListener('input', function() {
       const pct = this.value / 100;
       const range = maxDate.getTime() - minDate.getTime();
       currentMaxDate = new Date(minDate.getTime() + range * pct);
       const year = currentMaxDate.getFullYear();
       const month = String(currentMaxDate.getMonth() + 1).padStart(2, '0');
-      timeLabel.textContent = `2020 - ${year}-${month}`;
+      timeLabel.textContent = `${year}-${month}`;
       render();
     });
 
-    // Build legend
-    const legendEl = document.getElementById('legend');
-    Object.entries(orgColors).forEach(([org, color]) => {
-      legendEl.innerHTML += `
-        <div class="legend-item">
-          <div class="legend-dot" style="background:${color};"></div>
-          ${org}
-        </div>
-      `;
+    // Score sliders
+    const scoreMinSlider = document.getElementById('scoreMinSlider');
+    const scoreMaxSlider = document.getElementById('scoreMaxSlider');
+    const scoreMinLabel = document.getElementById('scoreMinLabel');
+    const scoreMaxLabel = document.getElementById('scoreMaxLabel');
+
+    scoreMinSlider.addEventListener('input', function() {
+      scoreMin = parseInt(this.value);
+      scoreMinLabel.textContent = scoreMin;
+      render();
+    });
+    scoreMaxSlider.addEventListener('input', function() {
+      scoreMax = parseInt(this.value);
+      scoreMaxLabel.textContent = scoreMax;
+      render();
+    });
+
+    // Toggles
+    document.getElementById('toggleLabels').addEventListener('change', function() {
+      showLabels = this.checked;
+      render();
+    });
+    document.getElementById('toggleLines').addEventListener('change', function() {
+      showLines = this.checked;
+      render();
+    });
+
+    // Point size
+    document.getElementById('sizeSlider').addEventListener('input', function() {
+      pointSize = parseInt(this.value);
+      render();
+    });
+
+    // Chart type buttons
+    document.querySelectorAll('.toolbar-btn[data-chart]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.toolbar-btn[data-chart]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        chartType = this.dataset.chart;
+        render();
+      });
+    });
+
+    // Download
+    document.getElementById('btnDownload').addEventListener('click', function() {
+      const url = chart.getDataURL({ type: 'png', pixelRatio: 2 });
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'capabilities-index.png';
+      a.click();
+    });
+
+    // Share
+    document.getElementById('btnShare').addEventListener('click', function() {
+      navigator.clipboard.writeText(window.location.href);
+      this.textContent = 'Copied!';
+      setTimeout(() => this.textContent = 'Share', 1500);
     });
 
     // Responsive
