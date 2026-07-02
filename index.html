@@ -314,11 +314,17 @@
 
       <div id="chart"></div>
 
-      <div id="paperInfo" style="display:none; margin-top:16px; padding:16px; background:#f9f9f9; border-radius:8px; border:1px solid #eee;">
-        <h4 id="paperTitle" style="font-size:14px; font-weight:600; margin-bottom:8px;"></h4>
-        <div style="display:flex; gap:12px;">
-          <a id="paperLink" href="#" target="_blank" style="font-size:13px; color:#1976d2; text-decoration:none;">Paper</a>
-          <a id="githubLink" href="#" target="_blank" style="font-size:13px; color:#333; text-decoration:none;">GitHub</a>
+      <div id="paperInfo" style="display:none; margin-top:16px; padding:24px; background:#f9f9f9; border-radius:8px; border:1px solid #eee; text-align:center;">
+        <h4 id="paperTitle" style="font-size:20px; font-weight:700; margin-bottom:16px;"></h4>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <a id="paperLink" href="#" target="_blank" style="font-size:16px; color:#1976d2; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Paper
+          </a>
+          <a id="githubLink" href="#" target="_blank" style="font-size:16px; color:#333; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
         </div>
       </div>
 
@@ -354,14 +360,14 @@
 
       <div class="setting-group">
         <label>Citation Range</label>
-        <input type="range" id="scoreMinSlider" min="0" max="180" value="0">
+        <input type="range" id="scoreMinSlider" min="0" max="12000" value="0">
         <div class="range-labels">
           <span>Min: <span id="scoreMinLabel">0</span></span>
           <span></span>
         </div>
-        <input type="range" id="scoreMaxSlider" min="0" max="180" value="180" style="margin-top:8px;">
+        <input type="range" id="scoreMaxSlider" min="0" max="12000" value="12000" style="margin-top:8px;">
         <div class="range-labels">
-          <span>Max: <span id="scoreMaxLabel">180</span></span>
+          <span>Max: <span id="scoreMaxLabel">12000</span></span>
           <span></span>
         </div>
       </div>
@@ -404,7 +410,23 @@
           { name: 'Specialized', children: ['Math', 'Physics', 'Chemistry', 'Finance', 'Healthcare & Medical Science', 'Code'] },
           { name: 'Autonomous Driving', children: ['Earth Science / Remote Sensing', 'Embodied Tasks', 'AI Agent'] },
         ],
-        colors: { 'General': '#e91e63', 'Specialized': '#26a69a', 'Autonomous Driving': '#5c6bc0' }
+        colors: {
+          'General': '#e91e63', 'Specialized': '#26a69a', 'Autonomous Driving': '#5c6bc0',
+          'Adaptability': '#e91e63',
+          'Basic Ability': '#f44336',
+          'Comprehensive Perception': '#d81b60',
+          'General Knowledge': '#c2185b',
+          'Safety': '#ad1457',
+          'Math': '#26a69a',
+          'Physics': '#00897b',
+          'Chemistry': '#00796b',
+          'Finance': '#43a047',
+          'Healthcare & Medical Science': '#2e7d32',
+          'Code': '#1b5e20',
+          'Earth Science / Remote Sensing': '#5c6bc0',
+          'Embodied Tasks': '#3949ab',
+          'AI Agent': '#283593',
+        }
       },
       'Generation Evaluation': {
         items: [
@@ -433,6 +455,12 @@
       return exploreCategories[currentExplore].colors;
     }
 
+    // Map org names to their color
+    function getColorForOrg(orgName) {
+      const colors = getOrgColors();
+      return colors[orgName] || '#999';
+    }
+
     const orgColors = getOrgColors();
 
     const allData = [
@@ -444,6 +472,14 @@
        org: "Adaptability",
        paper:"https://arxiv.org/abs/2304.08485",
        github:"https://github.com/haotian-liu/LLaVA"
+      },
+      {
+        name: "MIA-Bench",
+        date: "2024-07-01",
+        citations: 57,
+        org: "Adaptability",
+        paper: "https://arxiv.org/abs/2407.01509",
+        github: "https://github.com/apple/ml-mia-bench"
       }
     ];
 
@@ -453,7 +489,7 @@
     let selectedOrgs = new Set();
     let currentMaxDate = new Date('2026-07-01');
     let scoreMin = 0;
-    let scoreMax = 180;
+    let scoreMax = 12000;
     let showLabels = false;
     let showLines = false;
     let pointSize = 14;
@@ -528,12 +564,23 @@
       const items = exploreCategories[currentExplore].items;
       legendEl.innerHTML = '';
       items.forEach(group => {
-        legendEl.innerHTML += `
-          <div class="legend-item">
-            <div class="legend-dot" style="background:${colors[group.name]};"></div>
-            ${group.name}
-          </div>
-        `;
+        if (group.children && group.children.length > 0) {
+          group.children.forEach(child => {
+            legendEl.innerHTML += `
+              <div class="legend-item">
+                <div class="legend-dot" style="background:${colors[child] || colors[group.name]};"></div>
+                ${child}
+              </div>
+            `;
+          });
+        } else {
+          legendEl.innerHTML += `
+            <div class="legend-item">
+              <div class="legend-dot" style="background:${colors[group.name]};"></div>
+              ${group.name}
+            </div>
+          `;
+        }
       });
     }
 
@@ -560,7 +607,7 @@
             github: d.github,
           })),
           symbolSize: pointSize,
-          itemStyle: { color: getOrgColors()[org] },
+          itemStyle: { color: getColorForOrg(org) },
           lineStyle: showLines || chartType === 'line' ? { width: 2, opacity: 0.6 } : { width: 0 },
           showSymbol: true,
           label: {
@@ -616,10 +663,11 @@
           nameTextStyle: { fontSize: 13, color: '#666' },
           axisLine: { lineStyle: { color: '#ddd' } },
           axisTick: { lineStyle: { color: '#ddd' } },
-          axisLabel: { color: '#666', fontSize: 12 },
+          axisLabel: { color: '#666', fontSize: 12, formatter: v => v >= 1000 ? (v / 1000) + 'k' : v },
           splitLine: { lineStyle: { color: '#f5f5f5' } },
           min: 0,
-          max: maxCitations,
+          max: 12000,
+          interval: 2000,
         },
         series: series,
       };
