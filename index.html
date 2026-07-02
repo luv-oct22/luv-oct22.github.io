@@ -258,12 +258,45 @@
       color: #fff;
       border-color: #1a1a1a;
     }
+    .org-group {
+      margin-bottom: 8px;
+    }
+    .org-group-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .org-group-header .arrow {
+      font-size: 10px;
+      transition: transform 0.2s;
+      color: #999;
+    }
+    .org-group-header.expanded .arrow {
+      transform: rotate(90deg);
+    }
+    .org-group-children {
+      display: none;
+      padding-left: 24px;
+      margin-top: 4px;
+    }
+    .org-group-children.show {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .org-group-children .checkbox-item {
+      font-size: 12px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Model Capabilities Index</h1>
-    <p>Tracking AI model performance over time across organizations. Interactive scatter plot with filtering by organization, score range, and time period.</p>
+    <p>Tracking AI benchmark papers and their citations over time. Interactive scatter plot with filtering by category, citation range, and time period.</p>
   </div>
 
   <div class="main-layout">
@@ -281,6 +314,14 @@
 
       <div id="chart"></div>
 
+      <div id="paperInfo" style="display:none; margin-top:16px; padding:16px; background:#f9f9f9; border-radius:8px; border:1px solid #eee;">
+        <h4 id="paperTitle" style="font-size:14px; font-weight:600; margin-bottom:8px;"></h4>
+        <div style="display:flex; gap:12px;">
+          <a id="paperLink" href="#" target="_blank" style="font-size:13px; color:#1976d2; text-decoration:none;">Paper</a>
+          <a id="githubLink" href="#" target="_blank" style="font-size:13px; color:#333; text-decoration:none;">GitHub</a>
+        </div>
+      </div>
+
       <div class="legend" id="legend"></div>
     </div>
 
@@ -288,17 +329,17 @@
       <h3>Settings</h3>
 
       <div class="setting-group">
-        <label>Organizations</label>
-        <div class="checkbox-group" id="orgCheckboxes">
-        </div>
-      </div>
-
-      <div class="setting-group">
         <label class="explore-by-label">Explore by</label>
         <div class="chip-group" id="exploreByChips">
           <button class="chip" data-explore="Understanding Evaluation">Understanding Evaluation</button>
           <button class="chip" data-explore="Generation Evaluation">Generation Evaluation</button>
           <button class="chip active" data-explore="Leardboards and Tools">Leardboards and Tools</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Organizations</label>
+        <div class="checkbox-group" id="orgCheckboxes">
         </div>
       </div>
 
@@ -312,7 +353,7 @@
       </div>
 
       <div class="setting-group">
-        <label>Score Range</label>
+        <label>Citation Range</label>
         <input type="range" id="scoreMinSlider" min="0" max="180" value="0">
         <div class="range-labels">
           <span>Min: <span id="scoreMinLabel">0</span></span>
@@ -355,58 +396,61 @@
   </div>
 
   <script>
-    const orgColors = {
-      'Understanding Evaluation': '#e91e63',
-      'Generation Evaluation': '#26a69a',
-      'OpenAI': '#e91e63',
-      'Google': '#26a69a',
-      'Anthropic': '#5c6bc0',
-      'Meta': '#1976d2',
-      'Mistral': '#f57c00',
-      'DeepSeek': '#8e24aa',
+    // Define categories for each Explore mode
+    const exploreCategories = {
+      'Understanding Evaluation': {
+        items: [
+          { name: 'General', children: ['Adaptability', 'Basic Ability', 'Comprehensive Perception', 'General Knowledge', 'Safety'] },
+          { name: 'Specialized', children: ['Math', 'Physics', 'Chemistry', 'Finance', 'Healthcare & Medical Science', 'Code'] },
+          { name: 'Autonomous Driving', children: ['Earth Science / Remote Sensing', 'Embodied Tasks', 'AI Agent'] },
+        ],
+        colors: { 'General': '#e91e63', 'Specialized': '#26a69a', 'Autonomous Driving': '#5c6bc0' }
+      },
+      'Generation Evaluation': {
+        items: [
+          { name: 'Image Video', children: [] },
+          { name: 'Audio', children: [] },
+          { name: '3D', children: [] },
+        ],
+        colors: { 'Image Video': '#f57c00', 'Audio': '#8e24aa', '3D': '#1976d2' }
+      },
+      'Leardboards and Tools': {
+        items: [
+          { name: 'OpenAI', children: [] },
+          { name: 'Google', children: [] },
+          { name: 'Anthropic', children: [] },
+          { name: 'Meta', children: [] },
+          { name: 'Mistral', children: [] },
+          { name: 'DeepSeek', children: [] },
+        ],
+        colors: { 'OpenAI': '#e91e63', 'Google': '#26a69a', 'Anthropic': '#5c6bc0', 'Meta': '#1976d2', 'Mistral': '#f57c00', 'DeepSeek': '#8e24aa' }
+      },
     };
 
+    let currentExplore = 'Leardboards and Tools';
+
+    function getOrgColors() {
+      return exploreCategories[currentExplore].colors;
+    }
+
+    const orgColors = getOrgColors();
+
     const allData = [
-      {name: 'GPT-3', date: '2020-06-11', score: 48, org: 'OpenAI'},
-      {name: 'GPT-3.5', date: '2022-11-30', score: 72, org: 'OpenAI'},
-      {name: 'GPT-4', date: '2023-03-14', score: 98, org: 'OpenAI'},
-      {name: 'GPT-4 Turbo', date: '2023-11-06', score: 108, org: 'OpenAI'},
-      {name: 'GPT-4o', date: '2024-05-13', score: 118, org: 'OpenAI'},
-      {name: 'o1', date: '2024-09-12', score: 135, org: 'OpenAI'},
-      {name: 'o3', date: '2025-04-16', score: 156, org: 'OpenAI'},
-      {name: 'GPT-5', date: '2025-08-01', score: 168, org: 'OpenAI'},
-      {name: 'PaLM', date: '2022-04-04', score: 62, org: 'Google'},
-      {name: 'PaLM 2', date: '2023-05-10', score: 88, org: 'Google'},
-      {name: 'Gemini 1.0', date: '2023-12-06', score: 105, org: 'Google'},
-      {name: 'Gemini 1.5 Pro', date: '2024-02-15', score: 115, org: 'Google'},
-      {name: 'Gemini 2.0', date: '2024-12-11', score: 138, org: 'Google'},
-      {name: 'Gemini 2.5 Pro', date: '2025-03-25', score: 158, org: 'Google'},
-      {name: 'Claude 1', date: '2023-03-14', score: 78, org: 'Anthropic'},
-      {name: 'Claude 2', date: '2023-07-11', score: 90, org: 'Anthropic'},
-      {name: 'Claude 3 Haiku', date: '2024-03-04', score: 95, org: 'Anthropic'},
-      {name: 'Claude 3 Opus', date: '2024-03-04', score: 120, org: 'Anthropic'},
-      {name: 'Claude 3.5 Sonnet', date: '2024-06-20', score: 130, org: 'Anthropic'},
-      {name: 'Claude 4 Opus', date: '2025-05-22', score: 160, org: 'Anthropic'},
-      {name: 'LLaMA', date: '2023-02-24', score: 65, org: 'Meta'},
-      {name: 'LLaMA 2', date: '2023-07-18', score: 82, org: 'Meta'},
-      {name: 'LLaMA 3', date: '2024-04-18', score: 105, org: 'Meta'},
-      {name: 'LLaMA 3.1 405B', date: '2024-07-23', score: 122, org: 'Meta'},
-      {name: 'LLaMA 4', date: '2025-04-05', score: 145, org: 'Meta'},
-      {name: 'Mistral 7B', date: '2023-09-27', score: 70, org: 'Mistral'},
-      {name: 'Mixtral 8x7B', date: '2023-12-11', score: 85, org: 'Mistral'},
-      {name: 'Mistral Large', date: '2024-02-26', score: 102, org: 'Mistral'},
-      {name: 'Mistral Large 2', date: '2024-07-24', score: 118, org: 'Mistral'},
-      {name: 'Mistral Medium 3', date: '2025-05-17', score: 140, org: 'Mistral'},
-      {name: 'DeepSeek V1', date: '2024-01-05', score: 88, org: 'DeepSeek'},
-      {name: 'DeepSeek V2', date: '2024-05-16', score: 108, org: 'DeepSeek'},
-      {name: 'DeepSeek V3', date: '2024-12-26', score: 135, org: 'DeepSeek'},
-      {name: 'DeepSeek R1', date: '2025-01-20', score: 148, org: 'DeepSeek'},
+      // Format: {name, date, citations, org (category), paper, github}
+      // Data will be added by user
+      {name: "LLava-Bench", 
+       data: "2023-04-17",
+       citations:  10090,
+       org: "Adaptability",
+       paper:"https://arxiv.org/abs/2304.08485",
+       github:"https://github.com/haotian-liu/LLaVA"
+      }
     ];
 
     const chart = echarts.init(document.getElementById('chart'));
 
     // State
-    let selectedOrgs = new Set(Object.keys(orgColors));
+    let selectedOrgs = new Set();
     let currentMaxDate = new Date('2026-07-01');
     let scoreMin = 0;
     let scoreMax = 180;
@@ -419,34 +463,88 @@
 
     // Build org checkboxes
     const orgCheckboxContainer = document.getElementById('orgCheckboxes');
-    Object.entries(orgColors).forEach(([org, color]) => {
-      const item = document.createElement('label');
-      item.className = 'checkbox-item';
-      item.innerHTML = `
-        <input type="checkbox" checked data-org="${org}">
-        <span class="color-dot" style="background:${color};"></span>
-        ${org}
-      `;
-      orgCheckboxContainer.appendChild(item);
-    });
+
+    function buildOrgCheckboxes() {
+      const colors = getOrgColors();
+      const items = exploreCategories[currentExplore].items;
+      orgCheckboxContainer.innerHTML = '';
+      selectedOrgs = new Set();
+
+      items.forEach(group => {
+        const hasChildren = group.children && group.children.length > 0;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'org-group';
+
+        if (hasChildren) {
+          wrapper.innerHTML = `
+            <div class="org-group-header">
+              <span class="arrow">&#9654;</span>
+              <input type="checkbox" checked data-org="${group.name}">
+              <span class="color-dot" style="background:${colors[group.name]};"></span>
+              ${group.name}
+            </div>
+            <div class="org-group-children">
+              ${group.children.map(child => `
+                <label class="checkbox-item">
+                  <input type="checkbox" checked data-org="${child}" data-parent="${group.name}">
+                  ${child}
+                </label>
+              `).join('')}
+            </div>
+          `;
+          // Toggle expand/collapse
+          const header = wrapper.querySelector('.org-group-header');
+          const childrenDiv = wrapper.querySelector('.org-group-children');
+          header.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox') return;
+            header.classList.toggle('expanded');
+            childrenDiv.classList.toggle('show');
+          });
+        } else {
+          wrapper.innerHTML = `
+            <label class="checkbox-item">
+              <input type="checkbox" checked data-org="${group.name}">
+              <span class="color-dot" style="background:${colors[group.name]};"></span>
+              ${group.name}
+            </label>
+          `;
+        }
+
+        orgCheckboxContainer.appendChild(wrapper);
+        selectedOrgs.add(group.name);
+        if (hasChildren) {
+          group.children.forEach(c => selectedOrgs.add(c));
+        }
+      });
+    }
+
+    buildOrgCheckboxes();
 
     // Build legend
     const legendEl = document.getElementById('legend');
-    Object.entries(orgColors).forEach(([org, color]) => {
-      legendEl.innerHTML += `
-        <div class="legend-item">
-          <div class="legend-dot" style="background:${color};"></div>
-          ${org}
-        </div>
-      `;
-    });
+
+    function buildLegend() {
+      const colors = getOrgColors();
+      const items = exploreCategories[currentExplore].items;
+      legendEl.innerHTML = '';
+      items.forEach(group => {
+        legendEl.innerHTML += `
+          <div class="legend-item">
+            <div class="legend-dot" style="background:${colors[group.name]};"></div>
+            ${group.name}
+          </div>
+        `;
+      });
+    }
+
+    buildLegend();
 
     function render() {
       let filtered = allData.filter(d =>
         selectedOrgs.has(d.org) &&
         new Date(d.date) <= currentMaxDate &&
-        d.score >= scoreMin &&
-        d.score <= scoreMax
+        d.citations >= scoreMin &&
+        d.citations <= scoreMax
       );
 
       const orgs = [...new Set(filtered.map(d => d.org))];
@@ -456,11 +554,13 @@
           name: org,
           type: chartType === 'line' ? 'line' : 'scatter',
           data: orgData.map(d => ({
-            value: [d.date, d.score],
+            value: [d.date, d.citations],
             name: d.name,
+            paper: d.paper,
+            github: d.github,
           })),
           symbolSize: pointSize,
-          itemStyle: { color: orgColors[org] },
+          itemStyle: { color: getOrgColors()[org] },
           lineStyle: showLines || chartType === 'line' ? { width: 2, opacity: 0.6 } : { width: 0 },
           showSymbol: true,
           label: {
@@ -477,6 +577,8 @@
         };
       });
 
+      const maxCitations = filtered.length > 0 ? Math.max(...filtered.map(d => d.citations), 100) : 100;
+
       const option = {
         animation: true,
         animationDuration: 400,
@@ -487,12 +589,9 @@
           borderWidth: 1,
           textStyle: { color: '#333', fontSize: 13 },
           formatter: function(params) {
-            const org = params.seriesName;
-            const color = orgColors[org];
             return `<div style="font-weight:600;margin-bottom:4px;">${params.data.name}</div>
-                    <span style="color:${color};">${org}</span><br/>
                     <span style="color:#999;">Date:</span> ${params.data.value[0]}<br/>
-                    <span style="color:#999;">Score:</span> ${params.data.value[1]}`;
+                    <span style="color:#999;">Cited:</span> ${params.data.value[1]}`;
           }
         },
         grid: { left: 60, right: 30, top: 20, bottom: 50 },
@@ -511,16 +610,16 @@
         },
         yAxis: {
           type: 'value',
-          name: 'Capability Score',
+          name: 'Cited Number',
           nameLocation: 'center',
-          nameGap: 40,
+          nameGap: 45,
           nameTextStyle: { fontSize: 13, color: '#666' },
           axisLine: { lineStyle: { color: '#ddd' } },
           axisTick: { lineStyle: { color: '#ddd' } },
           axisLabel: { color: '#666', fontSize: 12 },
           splitLine: { lineStyle: { color: '#f5f5f5' } },
           min: 0,
-          max: 180,
+          max: maxCitations,
         },
         series: series,
       };
@@ -528,14 +627,57 @@
       chart.setOption(option, true);
     }
 
+    // Click on chart point to show paper/github links
+    chart.on('click', function(params) {
+      const paperInfo = document.getElementById('paperInfo');
+      const paperTitle = document.getElementById('paperTitle');
+      const paperLink = document.getElementById('paperLink');
+      const githubLink = document.getElementById('githubLink');
+
+      if (params.data && (params.data.paper || params.data.github)) {
+        paperTitle.textContent = params.data.name;
+        if (params.data.paper) {
+          paperLink.href = params.data.paper;
+          paperLink.style.display = 'inline';
+        } else {
+          paperLink.style.display = 'none';
+        }
+        if (params.data.github) {
+          githubLink.href = params.data.github;
+          githubLink.style.display = 'inline';
+        } else {
+          githubLink.style.display = 'none';
+        }
+        paperInfo.style.display = 'block';
+      } else {
+        paperInfo.style.display = 'none';
+      }
+    });
+
     // Org checkboxes
     orgCheckboxContainer.addEventListener('change', function(e) {
       if (e.target.type === 'checkbox') {
         const org = e.target.dataset.org;
+        const parent = e.target.dataset.parent;
         if (e.target.checked) {
           selectedOrgs.add(org);
         } else {
           selectedOrgs.delete(org);
+        }
+        // If parent checkbox toggled, also toggle all children
+        if (!parent) {
+          const category = exploreCategories[currentExplore].items.find(g => g.name === org);
+          if (category && category.children.length > 0) {
+            const childCheckboxes = orgCheckboxContainer.querySelectorAll(`input[data-parent="${org}"]`);
+            childCheckboxes.forEach(cb => {
+              cb.checked = e.target.checked;
+              if (e.target.checked) {
+                selectedOrgs.add(cb.dataset.org);
+              } else {
+                selectedOrgs.delete(cb.dataset.org);
+              }
+            });
+          }
         }
         render();
       }
@@ -619,7 +761,10 @@
       if (!chip) return;
       this.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      // Future: handle explore mode change
+      currentExplore = chip.dataset.explore;
+      buildOrgCheckboxes();
+      buildLegend();
+      render();
     });
 
     // Responsive
